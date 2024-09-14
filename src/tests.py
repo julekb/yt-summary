@@ -7,7 +7,6 @@ from config import get_config
 video_id = "dDYE0GPDV84"
 channel_id = "UCX92mVE0rfBDSyRticjqzIA"
 video_id_2 = "eA3gqNqRC1g"
-openai_model = OpenAIModels.GPT_3_5_TURBO
 
 
 config = get_config()

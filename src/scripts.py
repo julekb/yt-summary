@@ -1,15 +1,17 @@
-from bootstrap import bootstrap
-from config import get_config
-
-bushcraftowy_channel_id = "UCX92mVE0rfBDSyRticjqzIA"
-max_length = 1000
+from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
 
 
 def _print_visual_space():
     print("\n" * 2, "-" * 40, "\n" * 2)
 
 
-def run_demo(channel_id):
+def run_recent_video_summary_for_channel(
+    channel_id: str,
+    openai_client: OpenAIClient,
+    youtube_client: YoutubeClient,
+    transcription_client: TranscriptionClient,
+    max_length: int,
+) -> None:
     print("YO STOP WATCHIN START READIN")
     _print_visual_space()
 
@@ -28,15 +30,8 @@ def run_demo(channel_id):
 
     video_summary = openai_client.summarize_text(video_transcript, max_length=max_length)
     print(f"Summary in {max_length} chars:")
-    if config.ENV == "test":
+    if openai_client.is_faked:
         print(
             "Info: This output below is actually faked. Please add your own OPENAI key and set env variable YTS_ENV to dev."
         )
     print(video_summary)
-
-
-if __name__ == "__main__":
-    config = get_config()
-    openai_client, youtube_client, transcription_client = bootstrap(config)
-
-    run_demo(channel_id=bushcraftowy_channel_id)

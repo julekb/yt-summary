@@ -6,7 +6,7 @@ from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
 
 def bootstrap(config: Config) -> (OpenAIClient, YoutubeClient, TranscriptionClient):
     if config.ENV == "test":
-        openai_client = FakeOpenAIClient("fake-model")
+        openai_client = FakeOpenAIClient(model="fake-model")
     else:
         openai_client = OpenAIClientImplementation(
             api_key=config.OPENAI_API_KEY,

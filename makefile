@@ -1,3 +1,3 @@
 format:
-	black .
-	isort .
+	black ./src
+	isort ./src

@@ -1,3 +1,4 @@
+from config import Config
 from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
 from models import LanguageCode
 
@@ -7,6 +8,7 @@ def _print_visual_space():
 
 
 def run_recent_video_summary_for_channel(
+    config: Config,
     channel_id: str,
     openai_client: OpenAIClient,
     youtube_client: YoutubeClient,
@@ -38,7 +40,7 @@ def run_recent_video_summary_for_channel(
 
     video_summary = openai_client.summarize_text(video_transcript, max_length=max_length)
     print(f"Summary in {max_length} chars:")
-    if openai_client.is_faked:
+    if config.ENV != "dev":
         print(
             "Info: This output below is actually faked. Please add your own OPENAI key and set env variable YTS_ENV to dev."
         )

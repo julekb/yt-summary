@@ -16,7 +16,6 @@ class YoutubeClient(abc.ABC):
 
 @dataclass
 class OpenAIClient(abc.ABC):
-    is_faked: bool = field(init=False)
     model: str
 
     @abc.abstractmethod

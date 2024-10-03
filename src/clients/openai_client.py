@@ -11,7 +11,6 @@ class OpenAIModels(str, enum.Enum):
 
 
 class OpenAIClientImplementation(OpenAIClient):
-    is_faked = False
 
     def __init__(self, api_key: str, model: OpenAIModels):
         self.client = OpenAI(api_key=api_key)
@@ -35,7 +34,6 @@ class OpenAIClientImplementation(OpenAIClient):
 
 
 class FakeOpenAIClient(OpenAIClient):
-    is_faked = True
     model = "fake-model"
 
     def summarize_text(self, text: str, max_length: int):

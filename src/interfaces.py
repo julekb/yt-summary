@@ -19,7 +19,7 @@ class OpenAIClient(abc.ABC):
     model: str
 
     @abc.abstractmethod
-    def summarize_text(self, text: str, max_length: int): ...
+    def summarize_text(self, text: str, max_length: int, min_sections: int, max_sections: int): ...
 
 
 class TranscriptionClient(abc.ABC):

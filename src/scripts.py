@@ -3,6 +3,11 @@ from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
 from models import LanguageCode
 
 
+def calculate_min_max_section_count(char_length: int) -> tuple[int, int]:
+    min_sections = max(int(char_length / 1000), 1)
+    max_sections = max(int(char_length / 500), min_sections + 1)
+    return min_sections, max_sections
+
 def _print_visual_space():
     print("\n" * 2, "-" * 40, "\n" * 2)
 
@@ -38,7 +43,10 @@ def run_recent_video_summary_for_channel(
     print(video_transcript)
     _print_visual_space()
 
-    video_summary = openai_client.summarize_text(video_transcript, max_length=max_length)
+    min_sections, max_sections = calculate_min_max_section_count(max_length)
+    video_summary = openai_client.summarize_text(
+        video_transcript, max_length=max_length, min_sections=min_sections, max_sections=max_sections
+    )
     print(f"Summary in {max_length} chars:")
     if config.ENV != "dev":
         print(

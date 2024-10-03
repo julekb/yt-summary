@@ -15,7 +15,7 @@ def bootstrap(config: Config) -> tuple[OpenAIClient, YoutubeClient, Transcriptio
     else:
         openai_client = OpenAIClientImplementation(
             api_key=config.OPENAI_API_KEY,
-            model=OpenAIModels.GPT_3_5_TURBO,
+            model=OpenAIModels.GPT_4o_LATEST,
         )
 
     if config.OFFLINE_MODE:

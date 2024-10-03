@@ -6,6 +6,7 @@ from interfaces import OpenAIClient
 
 
 class OpenAIModels(str, enum.Enum):
+    GPT_4o_LATEST = "chatgpt-4o-latest"
     GPT_4 = "gpt-4o-mini"
     GPT_3_5_TURBO = "gpt-3.5-turbo-0125"
 
@@ -16,14 +17,16 @@ class OpenAIClientImplementation(OpenAIClient):
         self.client = OpenAI(api_key=api_key)
         self.model = model
 
-    def summarize_text(self, text: str, max_length: int):
+    def summarize_text(self, text: str, max_length: int, min_sections: int = 2, max_sections: int = 4):
         completion = self.client.chat.completions.create(
             model=self.model,
             messages=[
                 {
                     "role": "system",
-                    "content": f"You want to summerize the input and be precise and on-point using at most \
-                    {max_length} characters.",
+                    "content": f"Summerize the input and be precise and on-point using at most \
+                    {max_length} characters. Skip any advertisement. \
+                     Start with short numbered list of {str(min_sections)}-{str(max_sections)} main topics \
+                     and after that provide more context for each topic in a visually separated section.",
                 },
                 {"role": "user", "content": text},
             ],
@@ -36,7 +39,7 @@ class OpenAIClientImplementation(OpenAIClient):
 class FakeOpenAIClient(OpenAIClient):
     model = "fake-model"
 
-    def summarize_text(self, text: str, max_length: int):
+    def summarize_text(self, text: str, max_length: int, min_sections: int = 2, max_sections: int = 4):
         message = """
 The input provided is a detailed and lengthy transcription in Polish,
 covering various topics related to filming, answering viewer questions,

@@ -3,6 +3,8 @@ import pytest
 from clients.clients import YoutubeClientImplementation, YoutubeTranscriptClientImpl
 from clients.openai_client import OpenAIClientImplementation, OpenAIModels
 from config import get_config
+from models import LanguageCode
+from scripts import run_recent_video_summary_for_channel
 
 video_id = "dDYE0GPDV84"
 channel_id = "UCX92mVE0rfBDSyRticjqzIA"
@@ -32,7 +34,7 @@ class TestTranscriptClient:
         return YoutubeTranscriptClientImpl()
 
     def test_get_transcript(self, transcript_client):
-        captions = transcript_client.get_captions_for_video(video_id)
+        captions = transcript_client.get_captions_for_video(video_id, LanguageCode.PL)
         assert isinstance(captions, str)
 
 

@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 import yaml
 
-CONFIG_FILE = "config.yaml"
+CONFIG_FILE = "../config.yaml"
 
 
 class classproperty(property):
@@ -18,12 +18,14 @@ class Config:
     OPENAI_API_KEY: str
     GOOGLE_API_KEY: str
 
+    OFFLINE_MODE: str
+
     @classproperty
     def attributes(cls):
         return tuple(cls.__annotations__.keys())
 
 
-def get_config(overrides: dict[str, Any] = None) -> Config:
+def get_config(overrides: dict[str, Any] | None = None) -> Config:
     if not os.path.isfile(CONFIG_FILE):
         raise Exception("Config file missing.")
 

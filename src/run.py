@@ -4,20 +4,24 @@ from bootstrap import bootstrap
 from config import get_config
 from scripts import run_recent_video_summary_for_channel
 
+test_channel = "UC-Q1gV2g_ck4LZG8axhAeVg"
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-c", "--channel-id", required=False, type=str)
     parser.add_argument("-b", "--burn-money", required=False, action="store_true")
-    args = parser.parse_args()
+    parser.add_argument("-f", "--offline", required=False, action="store_true")
 
     args = parser.parse_args()
 
-    channel_id = args.channel_id
-    burn_money = args.burn_money
-    env = "dev" if burn_money else "test"
+    channel_id = args.channel_id or test_channel
 
-    config = get_config(overrides={"ENV": env})
+
+    config_overrides = {"ENV": "dev" if args.burn_money else "test", "OFFLINE_MODE": args.offline}
+
+    config = get_config(overrides=config_overrides)
+
 
     openai_client, youtube_client, transcription_client = bootstrap(config)
 

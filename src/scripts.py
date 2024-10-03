@@ -1,4 +1,5 @@
 from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
+from models import LanguageCode
 
 
 def _print_visual_space():
@@ -23,7 +24,14 @@ def run_recent_video_summary_for_channel(
         print(f"{key}: {val}")
     _print_visual_space()
 
-    video_transcript = transcription_client.get_captions_for_video(video_id)
+    video_details = youtube_client.get_videos_details(video_ids=[video_id])
+    print("Video details:\n")
+    print(video_details[0])
+
+    _print_visual_space()
+    lang = video_details[0]["language"][0] or LanguageCode.EN
+
+    video_transcript = transcription_client.get_captions_for_video(video_id, language=lang)
     print("Transcript:\n")
     print(video_transcript)
     _print_visual_space()

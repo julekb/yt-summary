@@ -1,11 +1,13 @@
 from dataclasses import dataclass
-from typing import Any, Literal
+from datetime import datetime
+from typing import Any
 
 from googleapiclient.discovery import Resource, build
 from youtube_transcript_api import TranscriptsDisabled, YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
 
 from interfaces import TranscriptionClient, YoutubeClient
+from models import LanguageCode
 
 
 @dataclass
@@ -16,9 +18,9 @@ class YoutubeClientImplementation(YoutubeClient):
     def build_resource(cls, api_key: str) -> None:
         return build("youtube", "v3", developerKey=api_key)
 
-    def get_latest_videos_for_channel(self, channel_id: str, latest_n: int) -> list[dict[str, Any]]:
+    def get_latest_videos_for_channel(self, channel_id: str, latest_n: int) -> list[dict]:
         if latest_n > 50:
-            raise Exception
+            raise Exception("Too many last videos requested.")
         request = self.service.search().list(
             part="id,snippet",
             type="video",
@@ -29,7 +31,7 @@ class YoutubeClientImplementation(YoutubeClient):
         response = request.execute()
         items = response["items"]
         if not items:
-            raise Exception
+            raise Exception(f"No videos found for channel id {channel_id}.")
         return [
             {
                 "id": item["id"]["videoId"],
@@ -52,7 +54,7 @@ class YoutubeClientImplementation(YoutubeClient):
                 localization = list(item["localizations"].keys())
             item_dict = {
                 "id": item["id"],
-                "localization": localization,
+                "language": localization,
             }
             out.append(item_dict)
         return out
@@ -63,18 +65,36 @@ class YoutubeClientImplementation(YoutubeClient):
         return response
 
 
-LanguageCode = Literal["pl", "en"]
-
-
 class YoutubeTranscriptClientImpl(TranscriptionClient):
     service = YouTubeTranscriptApi
     formatter = TextFormatter()
 
-    def get_captions_for_video(self, video_id: str, language: LanguageCode = "pl") -> str:
+    def get_captions_for_video(self, video_id: str, language: LanguageCode) -> str:
         try:
-            transcript_raw = self.service.get_transcript(video_id, languages=["pl"])
-        except TranscriptsDisabled:
-            raise Exception
+            transcript_raw = self.service.get_transcript(video_id, languages=[language])
+        except TranscriptsDisabled as e:
+            raise Exception(e)
 
         transcript = self.formatter.format_transcript(transcript_raw)
         return transcript
+
+
+class FakeYoutubeClient(YoutubeClient):
+    def get_latest_videos_for_channel(self, channel_id: str, latest_n: int) -> list[dict[str, Any]]:
+        return [{"id": "video_id"}]
+
+    def get_videos_details(self, video_ids: list[str]) -> list[dict]:
+        return [
+            {
+                "id": "123",
+                "title": "Fake vid title",
+                "description": "Fake vid description",
+                "published_at": datetime.now(),
+                "language": LanguageCode.EN
+            }
+        ]
+
+
+class FakeYoutubeTranscriptClient(YouTubeTranscriptApi):
+    def get_captions_for_video(self, video_id: str, language: LanguageCode) -> str:
+        return "These are faked video captions. Don't expect anything overly exciting."

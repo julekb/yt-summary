@@ -1,12 +1,8 @@
 from config import Config
 from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
 from models import LanguageCode
+from prompts import calculate_min_max_section_count, build_summary_request_prompt
 
-
-def calculate_min_max_section_count(char_length: int) -> tuple[int, int]:
-    min_sections = max(int(char_length / 1000), 1)
-    max_sections = max(int(char_length / 500), min_sections + 1)
-    return min_sections, max_sections
 
 def _print_visual_space():
     print("\n" * 2, "-" * 40, "\n" * 2)
@@ -43,10 +39,13 @@ def run_recent_video_summary_for_channel(
     print(video_transcript)
     _print_visual_space()
 
-    min_sections, max_sections = calculate_min_max_section_count(max_length)
-    video_summary = openai_client.summarize_text(
-        video_transcript, max_length=max_length, min_sections=min_sections, max_sections=max_sections
-    )
+    prompt = build_summary_request_prompt(video_transcript, 4000)
+    video_summary = openai_client.generate_text(prompt)
+
+    print(f"Prompt:\n")
+    for msg in prompt:
+        for key, val in msg.items():
+            print(key, val)
     print(f"Summary in {max_length} chars:")
     if config.ENV != "dev":
         print(

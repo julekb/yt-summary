@@ -19,6 +19,9 @@ class OpenAIClient(abc.ABC):
     model: str
 
     @abc.abstractmethod
+    def generate_text(self, prompt: list[dict[str, str]]) -> str: ...
+
+    @abc.abstractmethod
     def summarize_text(self, text: str, max_length: int, min_sections: int, max_sections: int): ...
 
 

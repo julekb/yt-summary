@@ -1,10 +1,8 @@
 import pytest
 
-from clients.clients import YoutubeClientImplementation, YoutubeTranscriptClientImpl
-from clients.openai_client import OpenAIClientImplementation, OpenAIModels
-from config import get_config
+from clients import OpenAIClientImplementation, OpenAIModels, YoutubeClientImplementation, YoutubeTranscriptClientImpl
+from config.config import get_config
 from models import LanguageCode
-from scripts import run_recent_video_summary_for_channel
 
 video_id = "dDYE0GPDV84"
 channel_id = "UCX92mVE0rfBDSyRticjqzIA"

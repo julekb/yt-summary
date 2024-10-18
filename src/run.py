@@ -1,7 +1,7 @@
 import argparse
 
 from bootstrap import bootstrap
-from config import get_config
+from config.config.config import get_config
 from scripts import run_recent_video_summary_for_channel
 
 test_channel = "UC-Q1gV2g_ck4LZG8axhAeVg"
@@ -17,14 +17,17 @@ if __name__ == "__main__":
 
     channel_id = args.channel_id or test_channel
 
-
     config_overrides = {"ENV": "dev" if args.burn_money else "test", "OFFLINE_MODE": args.offline}
 
     config = get_config(overrides=config_overrides)
 
-
     openai_client, youtube_client, transcription_client = bootstrap(config)
 
-    run_recent_video_summary_for_channel(config, channel_id=channel_id, openai_client=openai_client,
-                                         youtube_client=youtube_client, transcription_client=transcription_client,
-                                         max_length=2000)
+    run_recent_video_summary_for_channel(
+        config,
+        channel_id=channel_id,
+        openai_client=openai_client,
+        youtube_client=youtube_client,
+        transcription_client=transcription_client,
+        max_length=2000,
+    )

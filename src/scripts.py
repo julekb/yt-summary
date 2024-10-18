@@ -1,7 +1,7 @@
-from config import Config
+from config.config import Config
 from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
 from models import LanguageCode
-from prompts import calculate_min_max_section_count, build_summary_request_prompt
+from prompts import build_summary_request_prompt
 
 
 def _print_visual_space():
@@ -52,3 +52,5 @@ def run_recent_video_summary_for_channel(
             "Info: This output below is actually faked. Please add your own OPENAI key and set env variable YTS_ENV to dev."
         )
     print(video_summary)
+
+    return video_summary

@@ -19,11 +19,7 @@ class OpenAIClientImplementation(OpenAIClient):
         self.max_tokens = 10_000
 
     def generate_text(self, prompt: list[dict[str, str]]) -> str:
-        completion = self.client.chat.completions.create(
-            model=self.model,
-            messages=prompt,
-            max_tokens=self.max_tokens
-        )
+        completion = self.client.chat.completions.create(model=self.model, messages=prompt, max_tokens=self.max_tokens)
         return completion.choices[0].message.content
 
     def summarize_text(self, text: str, max_length: int, min_sections: int = 2, max_sections: int = 4):
@@ -34,13 +30,16 @@ class OpenAIClientImplementation(OpenAIClient):
                     "role": "system",
                     "content": "",
                 },
-                {"role": "user", "content": f"""Summerize the input and be precise and on-point using at most \
+                {
+                    "role": "user",
+                    "content": f"""Summerize the input and be precise and on-point using at most \
                     {max_length} characters. Skip any advertisement. \
                      Start with numbered list of {str(min_sections)}-{str(max_sections)} main topics. \
                      The topics should be short and descriptive.
                      After, provide more context for each topic in a visually separated section.\
                     
-                    Text: \"\"\" {text} \"\"\""""},
+                    Text: \"\"\" {text} \"\"\"""",
+                },
             ],
             max_tokens=2000,
         )

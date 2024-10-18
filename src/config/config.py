@@ -1,10 +1,11 @@
+import logging
 import os
 from dataclasses import dataclass
 from typing import Any, Literal
 
-import yaml
-
-CONFIG_FILE = "../config.yaml"
+from config.aws_config_helper import get_secrets as get_secrets_from_aws
+from config.yaml_config_helper import get_secrets as get_secrets_from_yaml
+from exceptions import ConfigError
 
 
 class classproperty(property):
@@ -26,14 +27,19 @@ class Config:
 
 
 def get_config(overrides: dict[str, Any] | None = None) -> Config:
-    if not os.path.isfile(CONFIG_FILE):
-        raise Exception("Config file missing.")
+    config_dict: dict[str, str] | None = None
+    for handler in (get_secrets_from_yaml, get_secrets_from_yaml):
+        try:
+            config_dict = handler()
+        except ConfigError as e:
+            logging.info(f"No config found using {handler.__name__}: {e}")
+
+    if config_dict is None:
+        raise ConfigError("Config Canno")
 
     env = os.environ.get("YTS_ENV", "test")
+    config_dict["ENV"] = env
 
-    with open(CONFIG_FILE, "r") as f:
-        config_dict = yaml.safe_load(f)
-        config_dict["ENV"] = env
     if overrides:
         for key, value in overrides.items():
             if key in Config.attributes:

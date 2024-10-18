@@ -1,7 +1,5 @@
-from clients.clients import (FakeYoutubeClient, FakeYoutubeTranscriptClient, YoutubeClientImplementation,
-                             YoutubeTranscriptClientImpl)
-from clients.openai_client import FakeOpenAIClient, OpenAIClientImplementation, OpenAIModels
-from config import Config
+import clients
+from config.config import Config
 from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
 
 
@@ -11,20 +9,20 @@ def bootstrap(config: Config) -> tuple[OpenAIClient, YoutubeClient, Transcriptio
     youtube_transcript_api: TranscriptionClient
 
     if config.OFFLINE_MODE or config.ENV == "test":
-        openai_client = FakeOpenAIClient(model="fake-model")
+        openai_client = clients.FakeOpenAIClient(model="fake-model")
     else:
-        openai_client = OpenAIClientImplementation(
+        openai_client = clients.OpenAIClientImplementation(
             api_key=config.OPENAI_API_KEY,
-            model=OpenAIModels.GPT_4o_LATEST,
+            model=clients.OpenAIModels.GPT_4o_LATEST,
         )
 
     if config.OFFLINE_MODE:
-        youtube_client = FakeYoutubeClient()
-        youtube_transcription_client = FakeYoutubeTranscriptClient()
+        youtube_client = clients.FakeYoutubeClient()
+        youtube_transcription_client = clients.FakeYoutubeTranscriptClient()
     else:
-        youtube_client_resource = YoutubeClientImplementation.build_resource(config.GOOGLE_API_KEY)
-        youtube_client = YoutubeClientImplementation(service=youtube_client_resource)  # type: ignore
-        youtube_transcription_client = YoutubeTranscriptClientImpl()
+        youtube_client_resource = clients.YoutubeClientImplementation.build_resource(config.GOOGLE_API_KEY)
+        youtube_client = clients.YoutubeClientImplementation(service=youtube_client_resource)
+        youtube_transcription_client = clients.YoutubeTranscriptClientImpl()
 
     return (
         openai_client,

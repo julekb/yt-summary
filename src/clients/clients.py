@@ -90,7 +90,7 @@ class FakeYoutubeClient(YoutubeClient):
                 "title": "Fake vid title",
                 "description": "Fake vid description",
                 "published_at": datetime.now(),
-                "language": LanguageCode.EN
+                "language": LanguageCode.EN,
             }
         ]
 

@@ -2,7 +2,7 @@ import enum
 
 from openai import OpenAI
 
-from interfaces import OpenAIClient
+from interfaces import AIClient
 
 
 class OpenAIModels(str, enum.Enum):
@@ -11,7 +11,7 @@ class OpenAIModels(str, enum.Enum):
     GPT_3_5_TURBO = "gpt-3.5-turbo-0125"
 
 
-class OpenAIClientImplementation(OpenAIClient):
+class OpenAIClientImplementation(AIClient):
 
     def __init__(self, api_key: str, model: OpenAIModels):
         self.client = OpenAI(api_key=api_key)
@@ -47,7 +47,7 @@ class OpenAIClientImplementation(OpenAIClient):
         return message
 
 
-class FakeOpenAIClient(OpenAIClient):
+class FakeOpenAIClient(AIClient):
     model = "fake-model"
     message = """
     The input provided is a detailed and lengthy transcription in Polish,

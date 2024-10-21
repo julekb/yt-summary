@@ -2,10 +2,13 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+import googleapiclient
 from googleapiclient.discovery import Resource, build
-from youtube_transcript_api import TranscriptsDisabled, YouTubeTranscriptApi
+from youtube_transcript_api import TranscriptList, TranscriptsDisabled, YouTubeTranscriptApi
+from youtube_transcript_api._errors import TranscriptsDisabled
 from youtube_transcript_api.formatters import TextFormatter
 
+from exceptions import ChannelNotFound, VideoNotFound, YoutubeClientException, YoutubeTranscriptClientException
 from interfaces import TranscriptionClient, YoutubeClient
 from models import LanguageCode
 
@@ -20,7 +23,7 @@ class YoutubeClientImplementation(YoutubeClient):
 
     def get_latest_videos_for_channel(self, channel_id: str, latest_n: int) -> list[dict]:
         if latest_n > 50:
-            raise Exception("Too many last videos requested.")
+            raise YoutubeClientException("Too many last videos requested.")
         request = self.service.search().list(
             part="id,snippet",
             type="video",
@@ -28,10 +31,14 @@ class YoutubeClientImplementation(YoutubeClient):
             channelId=channel_id,
             maxResults=latest_n,
         )
-        response = request.execute()
+        try:
+            response = request.execute()
+        except googleapiclient.errors.HttpError as e:
+            raise ChannelNotFound(f"Youtube channel id {channel_id} not found.")
+
         items = response["items"]
         if not items:
-            raise Exception(f"No videos found for channel id {channel_id}.")
+            raise VideoNotFound(f"No videos found for channel id {channel_id}.")
         return [
             {
                 "id": item["id"]["videoId"],
@@ -73,10 +80,22 @@ class YoutubeTranscriptClientImpl(TranscriptionClient):
         try:
             transcript_raw = self.service.get_transcript(video_id, languages=[language])
         except TranscriptsDisabled as e:
-            raise Exception(e)
+            raise YoutubeTranscriptClientException(
+                f"Transcript for video {video_id} might not be available for many reasons.. such as GoogleAPI blocking IP."
+            )
 
         transcript = self.formatter.format_transcript(transcript_raw)
         return transcript
+
+    def get_languages_for_video(self, video_id: str) -> list[str]:
+        try:
+            transcript_list = self.service.list_transcripts(video_id)
+        except TranscriptsDisabled as e:
+            raise YoutubeTranscriptClientException(e)
+        languages = [transcript.language_code for transcript in transcript_list]
+        if not languages:
+            raise YoutubeTranscriptClientException(f"No languages available for transcript for video {video_id}")
+        return languages
 
 
 class FakeYoutubeClient(YoutubeClient):

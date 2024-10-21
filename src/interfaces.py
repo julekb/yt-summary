@@ -2,6 +2,8 @@ import abc
 from dataclasses import dataclass, field
 from typing import Any
 
+from youtube_transcript_api import TranscriptList
+
 from models import LanguageCode
 
 
@@ -15,7 +17,7 @@ class YoutubeClient(abc.ABC):
 
 
 @dataclass
-class OpenAIClient(abc.ABC):
+class AIClient(abc.ABC):
     model: str
 
     @abc.abstractmethod
@@ -28,3 +30,6 @@ class OpenAIClient(abc.ABC):
 class TranscriptionClient(abc.ABC):
     @abc.abstractmethod
     def get_captions_for_video(self, video_id: str, language: LanguageCode) -> str: ...
+
+    @abc.abstractmethod
+    def get_languages_for_video(self, video_id: str) -> list[str]: ...

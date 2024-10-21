@@ -22,7 +22,7 @@ def build_summary_request_prompt(text: str, max_length: int):
                 f"{max_length} characters. Skip any advertisement."
                 f"Start with short numbered list of {str(min_sections)}-{str(max_sections)} main topics "
                 "and after that provide more context for each topic in a visually separated section.\n\n"
-                'Text: """ {text} """'
+                f'Text: """ {text} """'
             ),
         },
     ]

@@ -1,6 +1,5 @@
 from bootstrap import bootstrap
 from config.config import get_config
-from scripts import run_recent_video_summary_for_channel
 
 bushcraftowy_channel_id = "UCX92mVE0rfBDSyRticjqzIA"
 max_length = 1000
@@ -8,13 +7,10 @@ max_length = 1000
 
 if __name__ == "__main__":
     config = get_config()
-    openai_client, youtube_client, transcription_client = bootstrap(config)
 
-    run_recent_video_summary_for_channel(
-        config,
-        channel_id=bushcraftowy_channel_id,
-        openai_client=openai_client,
-        youtube_client=youtube_client,
-        transcription_client=transcription_client,
-        max_length=1000,
-    )
+    summary_service = bootstrap(config)
+    latest = summary_service.get_latest_video_for_channel(bushcraftowy_channel_id)
+    summary = summary_service.summary_for_video(latest)
+
+    print("Summary:")
+    print(summary)

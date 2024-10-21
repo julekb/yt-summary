@@ -1,8 +1,11 @@
 import pytest
 
+from bootstrap import bootstrap
 from clients import OpenAIClientImplementation, OpenAIModels, YoutubeClientImplementation, YoutubeTranscriptClientImpl
 from config.config import get_config
+from exceptions import ServiceException
 from models import LanguageCode
+from service import SummaryService
 
 video_id = "dDYE0GPDV84"
 channel_id = "UCX92mVE0rfBDSyRticjqzIA"
@@ -34,6 +37,10 @@ class TestTranscriptClient:
     def test_get_transcript(self, transcript_client):
         captions = transcript_client.get_captions_for_video(video_id, LanguageCode.PL)
         assert isinstance(captions, str)
+
+    def test_get_languages(self, transcript_client):
+        languages = transcript_client.get_languages_for_video(video_id)
+        assert languages
 
 
 class TestOpenAIClient:
@@ -829,3 +836,18 @@ class TestOpenAIClient:
         """
         output = openai_service.summarize_text(input_text, max_length=1000)
         assert output
+
+
+class TestSummaryService:
+    @pytest.fixture()
+    def summary_service(self):
+        return bootstrap(config)
+
+    def test_get_latest_video_for_channel_invalid_channel_id(self, summary_service):
+        invalid_channel_id = "not-a-channel-id"
+        with pytest.raises(ServiceException):
+            summary_service.get_latest_video_for_channel(invalid_channel_id)
+
+    def test_get_latest_video_for_channel_fucked_transcript(self, summary_service):
+        channel_id = "UC8JbbaZ_jgdsoUqrZ2bXtQQ"
+        summary_service.get_latest_video_for_channel(channel_id)

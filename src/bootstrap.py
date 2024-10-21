@@ -1,10 +1,11 @@
 import clients
 from config.config import Config
-from interfaces import OpenAIClient, TranscriptionClient, YoutubeClient
+from interfaces import AIClient, TranscriptionClient, YoutubeClient
+from service import SummaryService
 
 
-def bootstrap(config: Config) -> tuple[OpenAIClient, YoutubeClient, TranscriptionClient]:
-    openai_client: OpenAIClient
+def bootstrap(config: Config) -> SummaryService:
+    openai_client: AIClient
     youtube_client: YoutubeClient
     youtube_transcript_api: TranscriptionClient
 
@@ -24,8 +25,8 @@ def bootstrap(config: Config) -> tuple[OpenAIClient, YoutubeClient, Transcriptio
         youtube_client = clients.YoutubeClientImplementation(service=youtube_client_resource)
         youtube_transcription_client = clients.YoutubeTranscriptClientImpl()
 
-    return (
-        openai_client,
-        youtube_client,
-        youtube_transcription_client,
+    return SummaryService(
+        ai_client=openai_client,
+        youtube_client=youtube_client,
+        transcription_client=youtube_transcription_client,
     )
